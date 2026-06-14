@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jefrey Caal — ECE Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   GLOBAL / SHARED VARIABLES
+===================================================================== */
+:root{
+  /* REDLINE palette */
+  --paper:#ffffff;
+  --paper-alt:#f7f4ee;
+  --ink:#1c1c1a;
+  --ink-mid:#56524b;
+  --ink-soft:#a39d92;
+  --orange:#ff6a1a;
+  --orange-soft:#ffe6d5;
+  --red:#d7263d;
+  --line:#e8e2d6;
+  --maxw:1180px;
+
+  /* PCB intro palette */
+  --pcb-bg:#05080c;
+  --pcb-trace:#163b33;
+  --pcb-pulse:#9bffec;
+  --pcb-glow:#39ffc8;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Courier Prime','Courier New',monospace;}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+
+h1,h2,h3,.display{font-family:'Space Mono',monospace;font-weight:700;letter-spacing:-.02em;}
+.accent{color:var(--red);}
+.accent-o{color:var(--orange);}
+
+/* =====================================================================
+   INTRO — PCB FLY-THROUGH
+===================================================================== */
+#intro{
+  display:none;
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:var(--pcb-bg);
+  align-items:center;
+  justify-content:center;
+}
+#pcb-canvas{
+  width:100%;
+  height:100%;
+  display:block;
+  outline:none;
+}
+#skip-intro{
+  position:absolute;
+  bottom:28px;
+  right:28px;
+  z-index:1001;
+  font-family:'Space Mono',monospace;
+  font-size:.72rem;
+  letter-spacing:.2em;
+  padding:12px 22px;
+  background:transparent;
+  border:1px solid var(--pcb-pulse);
+  color:var(--pcb-pulse);
+  cursor:pointer;
+  transition:background .15s ease,color .15s ease;
+}
+#skip-intro:hover,
+#skip-intro:focus-visible{
+  background:var(--pcb-pulse);
+  color:var(--pcb-bg);
+  outline:2px solid var(--pcb-glow);
+  outline-offset:2px;
+}
+body.intro-active{overflow:hidden;}
+
+/* =====================================================================
+   HOMEPAGE WRAPPER (REDLINE)
+===================================================================== */
+.homepage{
+  font-family:'Courier Prime','Courier New',monospace;
+  background:var(--paper);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+  min-height:100vh;
+  background-image:
+    linear-gradient(rgba(28,28,26,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(28,28,26,.035) 1px, transparent 1px);
+  background-size:48px 48px;
+  opacity:1;
+  transition:opacity 1s ease;
+}
+body.intro-active .homepage{opacity:0;}
+.homepage.visible{opacity:1;}
+
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 32px;}
+
+/* ---------- section marker (dimension-line) ---------- */
+.marker{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.marker-num{font-family:'Space Mono',monospace;font-weight:700;font-size:.72rem;border:1px solid var(--orange);color:var(--orange);padding:3px 8px;letter-spacing:.1em;}
+.marker-rule{flex:0 0 36px;height:1px;background:var(--orange);position:relative;}
+.marker-rule::before,.marker-rule::after{content:'';position:absolute;width:1px;height:9px;background:var(--orange);top:-4px;}
+.marker-rule::before{left:0;}
+.marker-rule::after{right:0;}
+.marker-label{font-size:.72rem;letter-spacing:.25em;color:var(--ink-mid);}
+.section-title{font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:8px;}
+.section-sub{color:var(--ink-mid);font-size:.9rem;max-width:560px;margin-bottom:40px;}
+
+/* ---------- hero ---------- */
+.hero{padding:72px 0 60px;}
+.hero-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:56px;align-items:center;}
+.eyebrow{display:flex;align-items:center;gap:18px;margin-bottom:28px;flex-wrap:wrap;}
+.tag-pill{background:var(--ink);color:var(--paper);font-family:'Space Mono',monospace;font-size:.7rem;letter-spacing:.25em;padding:7px 14px;}
+.binary{color:var(--orange);font-size:.7rem;letter-spacing:.2em;font-family:'Space Mono',monospace;opacity:.55;}
+.hero h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1.02;margin-bottom:26px;}
+.hero h1 .slash{color:var(--orange);padding:0 6px;}
+.hero h1 .surname{color:var(--ink-soft);}
+.ribbon{display:inline-flex;align-items:center;gap:14px;background:var(--ink);color:var(--paper);padding:12px 36px 12px 16px;clip-path:polygon(0 0,100% 0,calc(100% - 22px) 100%,0 100%);font-family:'Space Mono',monospace;font-size:.85rem;margin-bottom:28px;}
+.ribbon .small{font-size:.65rem;letter-spacing:.3em;color:var(--orange);}
+.ribbon .arrow{color:var(--orange);padding:0 2px;}
+.hero .lede{max-width:520px;color:var(--ink-mid);font-size:.95rem;margin-bottom:36px;}
+.btn-row{display:flex;gap:16px;flex-wrap:wrap;}
+.btn{font-family:'Space Mono',monospace;font-size:.78rem;letter-spacing:.2em;padding:15px 30px;text-decoration:none;display:inline-flex;align-items:center;gap:10px;border:2px solid var(--ink);transition:all .15s ease;}
+.btn-primary{background:var(--orange);border-color:var(--orange);color:var(--ink);}
+.btn-primary:hover{background:var(--ink);border-color:var(--ink);color:var(--orange);}
+.btn-outline{background:transparent;color:var(--ink);}
+.btn-outline:hover{background:var(--ink);color:var(--paper);}
+.hero-art svg{width:100%;height:auto;display:block;}
+
+/* ---------- filter bar ---------- */
+.filter{padding:30px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+.filter-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.filter-label{color:var(--orange);font-size:.72rem;letter-spacing:.25em;font-family:'Space Mono',monospace;}
+.filter-btn{font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.15em;padding:9px 20px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;}
+.filter-btn:hover{border-color:var(--orange);color:var(--orange);}
+.filter-btn.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+/* ---------- projects ---------- */
+.projects{padding:72px 0;}
+.project-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;}
+.card{position:relative;border:1px solid var(--line);background:var(--paper);transition:transform .18s ease,box-shadow .18s ease;display:flex;flex-direction:column;}
+.card:hover{transform:translate(-4px,-4px);box-shadow:8px 8px 0 var(--orange-soft);}
+.card::before,.card::after{content:'';position:absolute;width:14px;height:14px;pointer-events:none;}
+.card::before{top:-1px;left:-1px;border-top:2px solid var(--orange);border-left:2px solid var(--orange);}
+.card::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--orange);border-right:2px solid var(--orange);}
+.card-top{height:4px;background:var(--orange);}
+.card.is-placeholder .card-top{background:var(--line);}
+.img-box{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-bottom:1px solid var(--line);}
+.img-placeholder{width:100%;aspect-ratio:16/10;background:var(--paper-alt);border-bottom:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink-soft);}
+.img-placeholder svg{width:36px;height:36px;}
+.img-placeholder span{font-size:.68rem;letter-spacing:.2em;font-family:'Space Mono',monospace;}
+.card-body{padding:26px;position:relative;flex:1;display:flex;flex-direction:column;}
+.card-tags{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.tag{font-size:.62rem;letter-spacing:.18em;padding:5px 11px;font-family:'Space Mono',monospace;}
+.tag-fill{background:var(--red);color:var(--paper);}
+.tag-line{border:1px solid var(--ink-soft);color:var(--ink-mid);}
+.card-num{position:absolute;top:26px;right:26px;font-family:'Space Mono',monospace;font-size:2.1rem;color:var(--line);font-weight:700;line-height:1;}
+.card h3{font-size:1.05rem;margin-bottom:12px;padding-right:54px;}
+.card p{font-size:.85rem;color:var(--ink-mid);flex:1;}
+.card-foot{display:flex;justify-content:space-between;align-items:center;margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:.7rem;font-family:'Space Mono',monospace;color:var(--ink-soft);letter-spacing:.1em;}
+.card.is-placeholder h3{color:var(--ink-soft);}
+.card.is-placeholder p{color:var(--ink-soft);font-style:italic;}
+
+/* ---------- skills ---------- */
+.skills{padding:72px 0;background:var(--paper-alt);}
+.skills-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;}
+.skill-col{border:1px solid var(--line);background:var(--paper);}
+.skill-head{background:var(--ink);color:var(--paper);font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.22em;padding:14px 16px;border-left:4px solid var(--orange);}
+.skill-list{list-style:none;padding:18px 16px;display:flex;flex-direction:column;gap:11px;}
+.skill-list li{display:flex;gap:8px;font-size:.84rem;align-items:baseline;}
+.skill-list li::before{content:'»';color:var(--red);font-weight:700;flex-shrink:0;}
+.skill-list li.is-add{color:var(--ink-soft);font-style:italic;}
+
+/* ---------- about ---------- */
+.about{padding:72px 0;}
+.about-grid{display:grid;grid-template-columns:300px 1fr;gap:48px;align-items:start;}
+.about-photo{aspect-ratio:1;background:var(--paper-alt);border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--ink-soft);position:relative;}
+.about-photo::before,.about-photo::after{content:'';position:absolute;width:16px;height:16px;}
+.about-photo::before{top:-1px;left:-1px;border-top:2px solid var(--orange);border-left:2px solid var(--orange);}
+.about-photo::after{bottom:-1px;right:-1px;border-bottom:2px solid var(--orange);border-right:2px solid var(--orange);}
+.about-photo svg{width:44px;height:44px;}
+.about-photo span{font-size:.68rem;letter-spacing:.2em;font-family:'Space Mono',monospace;}
+.about-text p{font-size:.95rem;color:var(--ink-mid);margin-bottom:18px;max-width:640px;}
+.about-text p:first-child{font-size:1.05rem;color:var(--ink);}
+.about-facts{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:28px;max-width:640px;}
+.fact{border:1px solid var(--line);padding:14px 16px;}
+.fact-label{display:block;font-size:.64rem;letter-spacing:.2em;color:var(--orange);font-family:'Space Mono',monospace;margin-bottom:6px;}
+.fact-value{font-size:.88rem;color:var(--ink);}
+
+/* ---------- experience ---------- */
+.experience{padding:72px 0;background:var(--paper-alt);}
+.timeline{position:relative;}
+.timeline::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--line);}
+.t-item{position:relative;padding-left:44px;padding-bottom:44px;}
+.t-item:last-child{padding-bottom:0;}
+.t-marker{position:absolute;left:0;top:5px;width:15px;height:15px;background:var(--orange);}
+.t-item.is-placeholder .t-marker{background:var(--paper);border:2px solid var(--line);}
+.t-head{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:baseline;margin-bottom:6px;}
+.t-head h3{font-size:1rem;}
+.t-date{font-family:'Space Mono',monospace;font-size:.7rem;color:var(--ink-soft);letter-spacing:.1em;white-space:nowrap;}
+.t-org{color:var(--red);font-size:.78rem;letter-spacing:.12em;font-family:'Space Mono',monospace;margin-bottom:10px;}
+.t-desc{font-size:.88rem;color:var(--ink-mid);max-width:680px;}
+.t-item.is-placeholder h3,.t-item.is-placeholder .t-org{color:var(--ink-soft);}
+.t-item.is-placeholder .t-desc{font-style:italic;}
+
+/* ---------- education ---------- */
+.education{padding:72px 0;}
+.edu-card{border:1px solid var(--line);padding:32px;display:grid;grid-template-columns:1fr auto;gap:24px;align-items:start;}
+.edu-card h3{font-size:1.15rem;margin-bottom:6px;}
+.edu-school{color:var(--red);font-size:.85rem;letter-spacing:.1em;font-family:'Space Mono',monospace;margin-bottom:14px;}
+.edu-date{font-family:'Space Mono',monospace;font-size:.75rem;color:var(--ink-soft);text-align:right;white-space:nowrap;}
+.edu-meta{display:flex;gap:32px;flex-wrap:wrap;margin-top:6px;}
+.edu-meta div{font-size:.8rem;color:var(--ink-mid);}
+.edu-meta span{display:block;font-size:.64rem;letter-spacing:.2em;color:var(--orange);font-family:'Space Mono',monospace;margin-bottom:6px;}
+.course-list{grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;padding-top:18px;border-top:1px solid var(--line);}
+.course-tag{font-size:.7rem;letter-spacing:.1em;border:1px solid var(--line);padding:6px 12px;color:var(--ink-mid);font-family:'Space Mono',monospace;}
+
+/* ---------- contact / footer ---------- */
+.contact{padding:88px 0;text-align:center;}
+.contact .marker{justify-content:center;}
+.contact h2{font-size:clamp(2rem,5vw,3.2rem);margin-bottom:18px;}
+.contact p{color:var(--ink-mid);max-width:520px;margin:0 auto 36px;}
+.contact-links{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;}
+.clink{border:1px solid var(--ink);padding:13px 26px;font-family:'Space Mono',monospace;font-size:.78rem;letter-spacing:.15em;text-decoration:none;color:var(--ink);}
+.clink:hover{background:var(--orange);border-color:var(--orange);}
+.site-footer{padding:28px 0;border-top:1px solid var(--line);text-align:center;font-size:.7rem;letter-spacing:.15em;color:var(--ink-soft);font-family:'Space Mono',monospace;}
+.sheet-label{position:fixed;bottom:18px;right:18px;font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.2em;color:var(--ink-soft);background:var(--paper);padding:6px 10px;border:1px solid var(--line);z-index:5;}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .hero-grid{grid-template-columns:1fr;}
+  .hero-art{order:-1;max-width:380px;margin:0 auto 12px;}
+  .project-grid{grid-template-columns:1fr;}
+  .skills-grid{grid-template-columns:repeat(2,1fr);}
+  .about-grid{grid-template-columns:1fr;}
+  .about-photo{max-width:320px;}
+  .edu-card{grid-template-columns:1fr;}
+  .edu-date{text-align:left;}
+}
+@media (max-width:600px){
+  .wrap{padding:0 20px;}
+  .skills-grid{grid-template-columns:1fr;}
+  .about-facts{grid-template-columns:1fr;}
+  .sheet-label{display:none;}
+}
+
+/* ---------- reduced motion: never show intro ---------- */
+@media (prefers-reduced-motion: reduce){
+  #intro{display:none !important;}
+  .homepage{opacity:1 !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- =====================================================================
+     INTRO — PCB FLY-THROUGH (Three.js + GSAP)
+     Skipped automatically if prefers-reduced-motion or WebGL unavailable.
+===================================================================== -->
+<div id="intro">
+  <canvas id="pcb-canvas" aria-hidden="true"></canvas>
+  <button id="skip-intro" type="button" aria-label="Skip intro animation">SKIP INTRO »</button>
+</div>
+
+<!-- =====================================================================
+     HOMEPAGE — REDLINE
+     HOW TO CUSTOMIZE:
+     1. Replace any [bracketed] placeholder text with your own content.
+     2. Each project card has a dashed "ADD PROJECT IMAGE" box. Replace it
+        with: <img src="your-image.jpg" alt="Project name" class="img-box">
+     3. To add MORE project cards, copy one whole <article class="card">
+        block and paste it inside <div class="project-grid">.
+     4. To add MORE skills / experience / courses, copy one <li>, <div
+        class="t-item">, or <span class="course-tag"> and edit the text.
+     5. All colors live in :root at the top of <style> — change the hex
+        values there to retheme the entire page at once.
+===================================================================== -->
+<div id="homepage" class="homepage">
+
+<header class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <div class="eyebrow">
+        <span class="tag-pill">ECE STUDENT</span>
+        <span class="binary">10110100 01101010</span>
+      </div>
+      <h1>JEFREY<span class="slash">/</span><span class="surname">CAAL</span></h1>
+      <div class="ribbon">
+        <span class="small">SYSTEMS</span><span class="arrow">»</span>
+        <span>ELECTRICAL &amp; COMPUTER ENGINEERING</span>
+      </div>
+      <p class="lede">Building at the intersection of power electronics, embedded systems, and clean energy — from 54kWh battery modules to nuclear reactor simulations.</p>
+      <div class="btn-row">
+        <a href="#projects" class="btn btn-primary">VIEW PROJECTS »</a>
+        <a href="#contact" class="btn btn-outline">GET IN TOUCH</a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg viewBox="0 0 480 400" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <rect x="16" y="16" width="448" height="368" stroke="var(--line)" stroke-width="1" stroke-dasharray="4 6"/>
+        <rect x="180" y="130" width="120" height="140" fill="var(--paper)" stroke="var(--ink)" stroke-width="2"/>
+        <text x="240" y="195" text-anchor="middle" font-family="Space Mono, monospace" font-size="16" font-weight="700" fill="var(--ink)">MCU</text>
+        <text x="240" y="216" text-anchor="middle" font-family="Courier Prime, monospace" font-size="10" letter-spacing="2" fill="var(--ink-soft)">ESP32</text>
+        <rect x="164" y="150" width="16" height="8" fill="var(--ink)"/>
+        <rect x="164" y="190" width="16" height="8" fill="var(--ink)"/>
+        <rect x="164" y="230" width="16" height="8" fill="var(--ink)"/>
+        <rect x="300" y="150" width="16" height="8" fill="var(--ink)"/>
+        <rect x="300" y="190" width="16" height="8" fill="var(--ink)"/>
+        <rect x="300" y="230" width="16" height="8" fill="var(--ink)"/>
+        <path d="M164 154 H80" stroke="var(--orange)" stroke-width="1.5"/>
+        <path d="M164 194 H40 V340" stroke="var(--ink-soft)" stroke-width="1.5"/>
+        <path d="M164 234 H100" stroke="var(--red)" stroke-width="1.5"/>
+        <path d="M316 154 H400" stroke="var(--red)" stroke-width="1.5"/>
+        <path d="M316 194 H440 V60" stroke="var(--ink-soft)" stroke-width="1.5"/>
+        <path d="M316 234 H400" stroke="var(--orange)" stroke-width="1.5"/>
+        <circle cx="80" cy="154" r="4" fill="var(--orange)"/>
+        <circle cx="40" cy="194" r="4" fill="var(--ink-soft)"/>
+        <circle cx="40" cy="340" r="3" fill="var(--ink)"/>
+        <circle cx="100" cy="234" r="4" fill="var(--red)"/>
+        <circle cx="400" cy="154" r="4" fill="var(--red)"/>
+        <circle cx="440" cy="194" r="4" fill="var(--ink-soft)"/>
+        <circle cx="440" cy="60" r="3" fill="var(--ink)"/>
+        <circle cx="400" cy="234" r="4" fill="var(--orange)"/>
+        <path d="M60 340 H76 L84 326 L100 354 L116 326 L132 354 L140 340 H156" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="60" cy="340" r="3" fill="var(--ink-soft)"/>
+        <circle cx="156" cy="340" r="3" fill="var(--ink-soft)"/>
+        <line x1="340" y1="70" x2="368" y2="70" stroke="var(--ink)" stroke-width="2"/>
+        <line x1="368" y1="55" x2="368" y2="85" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="380" y1="55" x2="380" y2="85" stroke="var(--ink)" stroke-width="2.5"/>
+        <line x1="380" y1="70" x2="408" y2="70" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="340" cy="70" r="3" fill="var(--ink-soft)"/>
+        <circle cx="408" cy="70" r="3" fill="var(--ink-soft)"/>
+      </svg>
+    </div>
+  </div>
+</header>
+
+<nav class="filter">
+  <div class="wrap filter-row">
+    <span class="filter-label">// FILTER BY</span>
+    <button class="filter-btn active" data-filter="all">ALL</button>
+    <button class="filter-btn" data-filter="ece">ECE</button>
+    <button class="filter-btn" data-filter="software">SOFTWARE</button>
+    <button class="filter-btn" data-filter="hardware">HARDWARE</button>
+  </div>
+</nav>
+
+<section class="projects" id="projects">
+  <div class="wrap">
+    <div class="marker"><span class="marker-num">02</span><span class="marker-rule"></span><span class="marker-label">SELECTED WORK</span></div>
+    <h2 class="section-title">PROJECTS</h2>
+    <p class="section-sub">A running log of what I've built — filter by category or scroll through everything below.</p>
+
+    <div class="project-grid">
+      <!-- CARD 01 -->
+      <article class="card" data-tags="ece hardware">
+        <div class="card-top"></div>
+        <!-- Replace this div with: <img src="battery-module.jpg" alt="Battery module assembly" class="img-box"> -->
+        <div class="img-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>ADD PROJECT IMAGE</span>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag tag-fill">ECE</span>
+            <span class="tag tag-line">HARDWARE</span>
+          </div>
+          <span class="card-num">01</span>
+          <h3>BATTERY MODULE &amp; BDU ASSEMBLY</h3>
+          <p>54kWh battery system, 372 cells in 12s31p config. CAD in SolidWorks &amp; NX for busbars, harnesses, and enclosure.</p>
+          <div class="card-foot"><span>SOLIDWORKS · NX</span><span>2026</span></div>
+        </div>
+      </article>
+
+      <!-- CARD 02 -->
+      <article class="card" data-tags="software">
+        <div class="card-top"></div>
+        <!-- Replace this div with: <img src="reactor-sim.jpg" alt="Nuclear reactor simulator" class="img-box"> -->
+        <div class="img-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>ADD PROJECT IMAGE</span>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag tag-fill">SOFTWARE</span>
+            <span class="tag tag-line">PYTHON</span>
+          </div>
+          <span class="card-num">02</span>
+          <h3>NUCLEAR REACTOR SIM</h3>
+          <p>Python simulator modeling control rods, power output, and real-time thermal behavior. Tkinter GUI with color-coded visualization.</p>
+          <div class="card-foot"><span>PYTHON · TKINTER</span><span>2025</span></div>
+        </div>
+      </article>
+
+      <!-- CARD 03 — placeholder, duplicate this block for more projects -->
+      <article class="card is-placeholder" data-tags="ece software">
+        <div class="card-top"></div>
+        <!-- Replace this div with: <img src="your-project.jpg" alt="Project name" class="img-box"> -->
+        <div class="img-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>ADD PROJECT IMAGE</span>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag tag-fill">TAG</span>
+            <span class="tag tag-line">TAG</span>
+          </div>
+          <span class="card-num">03</span>
+          <h3>[ PROJECT TITLE ]</h3>
+          <p>Short description — what it does, the tools you used, and your role on the project.</p>
+          <div class="card-foot"><span>TOOLS USED</span><span>20XX</span></div>
+        </div>
+      </article>
+
+      <!-- CARD 04 — placeholder, duplicate this block for more projects -->
+      <article class="card is-placeholder" data-tags="hardware">
+        <div class="card-top"></div>
+        <!-- Replace this div with: <img src="your-project.jpg" alt="Project name" class="img-box"> -->
+        <div class="img-placeholder">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+          <span>ADD PROJECT IMAGE</span>
+        </div>
+        <div class="card-body">
+          <div class="card-tags">
+            <span class="tag tag-fill">TAG</span>
+            <span class="tag tag-line">TAG</span>
+          </div>
+          <span class="card-num">04</span>
+          <h3>[ PROJECT TITLE ]</h3>
+          <p>Short description — what it does, the tools you used, and your role on the project.</p>
+          <div class="card-foot"><span>TOOLS USED</span><span>20XX</span></div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="skills">
+  <div class="wrap">
+    <div class="marker"><span class="marker-num">03</span><span class="marker-rule"></span><span class="marker-label">CAPABILITIES</span></div>
+    <h2 class="section-title">SKILLS <span class="accent">&amp;</span> TOOLS</h2>
+    <p class="section-sub">The languages, platforms, and design tools I reach for most.</p>
+
+    <div class="skills-grid">
+      <div class="skill-col">
+        <div class="skill-head">SOFTWARE</div>
+        <ul class="skill-list">
+          <li>Python</li>
+          <li>C++</li>
+          <li>MATLAB</li>
+          <li class="is-add">+ add tool</li>
+        </ul>
+      </div>
+      <div class="skill-col">
+        <div class="skill-head">CAD &amp; DESIGN</div>
+        <ul class="skill-list">
+          <li>SolidWorks</li>
+          <li>Siemens NX</li>
+          <li>KiCAD</li>
+          <li class="is-add">+ add tool</li>
+        </ul>
+      </div>
+      <div class="skill-col">
+        <div class="skill-head">EMBEDDED</div>
+        <ul class="skill-list">
+          <li>STM32</li>
+          <li>ESP32</li>
+          <li>Raspberry Pi</li>
+          <li class="is-add">+ add tool</li>
+        </ul>
+      </div>
+      <div class="skill-col">
+        <div class="skill-head">TOOLS &amp; PLATFORMS</div>
+        <ul class="skill-list">
+          <li>Git</li>
+          <li>Altium Designer</li>
+          <li>LTspice</li>
+          <li class="is-add">+ add tool</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="about">
+  <div class="wrap">
+    <div class="marker"><span class="marker-num">04</span><span class="marker-rule"></span><span class="marker-label">WHO I AM</span></div>
+    <h2 class="section-title">ABOUT ME</h2>
+
+    <div class="about-grid">
+      <!-- Replace this div with: <img src="profile-photo.jpg" alt="Your name" class="about-photo"> (keep the about-photo class for sizing) -->
+      <div class="about-photo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <span>ADD PHOTO</span>
+      </div>
+      <div class="about-text">
+        <p>[ Write a short introduction here — who you are, what you're studying, and what kind of problems you like to solve. ]</p>
+        <p>[ Add a second paragraph about your interests, current focus, or what you're working toward. This whole block is yours to rewrite. ]</p>
+        <div class="about-facts">
+          <div class="fact"><span class="fact-label">LOCATION</span><span class="fact-value">[ City, State ]</span></div>
+          <div class="fact"><span class="fact-label">SCHOOL</span><span class="fact-value">[ University Name ]</span></div>
+          <div class="fact"><span class="fact-label">GRADUATING</span><span class="fact-value">[ Expected 20XX ]</span></div>
+          <div class="fact"><span class="fact-label">FOCUS</span><span class="fact-value">[ Power Electronics / Embedded ]</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="experience">
+  <div class="wrap">
+    <div class="marker"><span class="marker-num">05</span><span class="marker-rule"></span><span class="marker-label">HISTORY</span></div>
+    <h2 class="section-title">EXPERIENCE</h2>
+
+    <div class="timeline">
+      <div class="t-item">
+        <div class="t-marker"></div>
+        <div class="t-head">
+          <h3>ENGINEERING &amp; PERMITTING INTERN</h3>
+          <span class="t-date">MAY 2026 – AUG 2026</span>
+        </div>
+        <div class="t-org">SOUTH COAST AQMD</div>
+        <p class="t-desc">Reviewed permit documentation, identified 100+ pollutants using OnBase systems.</p>
+      </div>
+
+      <!-- Placeholder entry — duplicate this block for more roles -->
+      <div class="t-item is-placeholder">
+        <div class="t-marker"></div>
+        <div class="t-head">
+          <h3>[ ROLE TITLE ]</h3>
+          <span class="t-date">[ MONTH 20XX – MONTH 20XX ]</span>
+        </div>
+        <div class="t-org">[ COMPANY / ORGANIZATION ]</div>
+        <p class="t-desc">Describe your responsibilities, the tools you used, and any measurable results or impact.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="education">
+  <div class="wrap">
+    <div class="marker"><span class="marker-num">06</span><span class="marker-rule"></span><span class="marker-label">BACKGROUND</span></div>
+    <h2 class="section-title">EDUCATION</h2>
+
+    <div class="edu-card">
+      <div>
+        <h3>B.S. ELECTRICAL &amp; COMPUTER ENGINEERING</h3>
+        <div class="edu-school">[ UNIVERSITY NAME ]</div>
+        <div class="edu-meta">
+          <div><span>GPA</span>[ X.XX / 4.00 ]</div>
+          <div><span>FOCUS</span>[ Power Systems / Embedded Design ]</div>
+        </div>
+      </div>
+      <div class="edu-date">EXPECTED<br>20XX</div>
+      <div class="course-list">
+        <span class="course-tag">CIRCUIT ANALYSIS</span>
+        <span class="course-tag">EMBEDDED SYSTEMS</span>
+        <span class="course-tag">POWER ELECTRONICS</span>
+        <span class="course-tag">SIGNALS &amp; SYSTEMS</span>
+        <span class="course-tag is-add">+ ADD COURSE</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap">
+    <div class="marker"><span class="marker-num">07</span><span class="marker-rule"></span><span class="marker-label">CONNECT</span></div>
+    <h2>LET'S BUILD SOMETHING</h2>
+    <p>Open to internships and research opportunities in power electronics, embedded systems, and clean energy. Reach out — I'd love to hear what you're working on.</p>
+    <div class="contact-links">
+      <a class="clink" href="mailto:your.email@example.com">EMAIL</a>
+      <a class="clink" href="#">LINKEDIN</a>
+      <a class="clink" href="#">GITHUB</a>
+      <a class="clink" href="#">RESUME</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">© 2026 JEFREY CAAL — BUILT WITH HTML &amp; CSS</footer>
+<div class="sheet-label">SHEET 01 // REV 2026</div>
+
+</div><!-- /#homepage -->
+
+<!-- =====================================================================
+     LIBRARIES — both served from cdnjs (allowed CDN)
+===================================================================== -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+<script>
+/* =====================================================================
+   PROJECT FILTER (homepage)
+===================================================================== */
+(function(){
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.card');
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      cards.forEach(card => {
+        const tags = (card.dataset.tags || '').split(' ');
+        card.style.display = (f === 'all' || tags.includes(f)) ? '' : 'none';
+      });
+    });
+  });
+})();
+
+/* =====================================================================
+   PCB FLY-THROUGH INTRO
+   - Skips automatically if prefers-reduced-motion is set, or if
+     Three.js / GSAP / WebGL is unavailable. In all skip cases the
+     homepage is simply shown (it's visible by default).
+===================================================================== */
+(function(){
+  const introEl = document.getElementById('intro');
+  const homepageEl = document.getElementById('homepage');
+  const skipBtn = document.getElementById('skip-intro');
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return; // homepage is visible by default — nothing to do
+
+  if (typeof THREE === 'undefined' || typeof gsap === 'undefined') return;
+
+  // quick WebGL availability check
+  function hasWebGL(){
+    try{
+      const c = document.createElement('canvas');
+      return !!(window.WebGLRenderingContext && (c.getContext('webgl') || c.getContext('experimental-webgl')));
+    }catch(e){ return false; }
+  }
+  if (!hasWebGL()) return;
+
+  // Activate the intro
+  document.body.classList.add('intro-active');
+  introEl.style.display = 'flex';
+  homepageEl.classList.remove('visible');
+
+  let rafId;
+  let renderer, resizeHandler;
+
+  function finish(){
+    homepageEl.classList.add('visible');
+    document.body.classList.remove('intro-active');
+    introEl.style.display = 'none';
+    if (rafId) cancelAnimationFrame(rafId);
+    if (resizeHandler) window.removeEventListener('resize', resizeHandler);
+    if (renderer){
+      renderer.dispose();
+    }
+    const h1 = homepageEl.querySelector('h1');
+    if (h1){ h1.setAttribute('tabindex','-1'); h1.focus({preventScroll:true}); }
+  }
+
+  try {
+    const canvas = document.getElementById('pcb-canvas');
+    renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: false, powerPreference: 'low-power' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x05080c);
+    scene.fog = new THREE.FogExp2(0x05080c, 0.045);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+
+    scene.add(new THREE.AmbientLight(0x0d2a28, 1.2));
+    const pulseLight = new THREE.PointLight(0x6dffe3, 3, 12, 2);
+    scene.add(pulseLight);
+
+    // ---- main trace path ----
+    const curvePts = [
+      new THREE.Vector3(-10, 0.6, 1.5),
+      new THREE.Vector3(-6, 1.4, -1),
+      new THREE.Vector3(-2, -0.6, -3.5),
+      new THREE.Vector3(2.2, 0.8, -6),
+      new THREE.Vector3(6.2, 0.1, -9)
+    ];
+    const curve = new THREE.CatmullRomCurve3(curvePts);
+
+    const traceTube = new THREE.Mesh(
+      new THREE.TubeGeometry(curve, 120, 0.045, 8, false),
+      new THREE.MeshBasicMaterial({ color: 0x163b33 })
+    );
+    scene.add(traceTube);
+
+    // ---- board backdrop + grid ----
+    const board = new THREE.Mesh(
+      new THREE.PlaneGeometry(60, 40),
+      new THREE.MeshBasicMaterial({ color: 0x070d12, side: THREE.DoubleSide })
+    );
+    board.position.set(0, -4, -5);
+    board.rotation.x = Math.PI / 2.3;
+    scene.add(board);
+
+    const gridHelper = new THREE.GridHelper(60, 30, 0x102420, 0x0a1815);
+    gridHelper.position.set(0, -3.98, -5);
+    scene.add(gridHelper);
+
+    // ---- vias ----
+    const viaMat = new THREE.MeshBasicMaterial({ color: 0x2a5a4f });
+    [0.15, 0.4, 0.65, 0.85].forEach(t => {
+      const p = curve.getPointAt(t);
+      const via = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.05, 12), viaMat);
+      via.position.copy(p);
+      via.position.y -= 0.05;
+      scene.add(via);
+    });
+
+    // ---- branch traces + components (static, for visual interest) ----
+    function addBranch(t, dir, comp){
+      const start = curve.getPointAt(t);
+      const end = start.clone().add(dir);
+      const branchCurve = new THREE.CatmullRomCurve3([start, end]);
+      const branchTube = new THREE.Mesh(
+        new THREE.TubeGeometry(branchCurve, 8, 0.03, 6, false),
+        new THREE.MeshBasicMaterial({ color: 0x123a30 })
+      );
+      scene.add(branchTube);
+
+      if (comp === 'resistor') {
+        const body = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.16, 0.16), new THREE.MeshStandardMaterial({ color: 0x3a2a1a, roughness: 0.6 }));
+        body.position.copy(end);
+        const band = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.18, 0.18), new THREE.MeshStandardMaterial({ color: 0xd7263d, roughness: 0.5 }));
+        band.position.copy(end).add(new THREE.Vector3(0.15, 0, 0));
+        scene.add(body, band);
+      } else if (comp === 'capacitor') {
+        const body = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.3, 16), new THREE.MeshStandardMaterial({ color: 0x1c2a2e, roughness: 0.4 }));
+        body.position.copy(end);
+        body.rotation.z = Math.PI / 2;
+        scene.add(body);
+      }
+    }
+    addBranch(0.28, new THREE.Vector3(-0.8, 0.9, 0.4), 'resistor');
+    addBranch(0.6, new THREE.Vector3(0.6, -1.0, 0.6), 'capacitor');
+
+    // ---- the pulse ----
+    const pulse = new THREE.Mesh(
+      new THREE.SphereGeometry(0.1, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0x9bffec })
+    );
+    scene.add(pulse);
+
+    // ---- IC chip ----
+    const icGroup = new THREE.Group();
+    const icMat = new THREE.MeshStandardMaterial({ color: 0x12161c, emissive: 0x39ffc8, emissiveIntensity: 0, roughness: 0.35, metalness: 0.4 });
+    const icBody = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.3, 1.6), icMat);
+    icGroup.add(icBody);
+
+    const pinMaterials = [];
+    const pinGeo = new THREE.BoxGeometry(0.12, 0.08, 0.3);
+    for (let i = 0; i < 4; i++) {
+      [-0.85, 0.85].forEach(side => {
+        const m = new THREE.MeshStandardMaterial({ color: 0x2a2e35, emissive: 0x39ffc8, emissiveIntensity: 0 });
+        const pin = new THREE.Mesh(pinGeo, m);
+        pin.position.set(side, -0.05, -0.555 + i * 0.37);
+        icGroup.add(pin);
+        pinMaterials.push(m);
+      });
+    }
+    icGroup.position.copy(curvePts[curvePts.length - 1]);
+    scene.add(icGroup);
+
+    // ---- camera follow ----
+    function updateCamera(t){
+      const ct = Math.min(t, 0.999);
+      const pos = curve.getPointAt(ct);
+      const ahead = curve.getPointAt(Math.min(ct + 0.015, 1));
+      pulse.position.copy(pos);
+      pulseLight.position.copy(pos);
+      const wobble = Math.sin(t * 30) * 0.015;
+      camera.position.set(pos.x, pos.y + 0.55 + wobble, pos.z + 2.1);
+      camera.lookAt(ahead.x, ahead.y + 0.1, ahead.z);
+    }
+    updateCamera(0);
+
+    // ---- render loop ----
+    function renderLoop(){
+      rafId = requestAnimationFrame(renderLoop);
+      renderer.render(scene, camera);
+    }
+    renderLoop();
+
+    // ---- resize ----
+    resizeHandler = function(){
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', resizeHandler);
+
+    // ---- GSAP master timeline ----
+    const progress = { t: 0 };
+    const tl = gsap.timeline({ onComplete: finish });
+
+    // 1. travel along the trace, camera follows
+    tl.to(progress, {
+      t: 1, duration: 4.2, ease: 'power1.inOut',
+      onUpdate: () => updateCamera(progress.t)
+    });
+
+    // 2. power-on: chip glow + flash + pins light up in sequence
+    tl.to(icMat, { emissiveIntensity: 1.4, duration: 0.5, ease: 'power2.out' }, '+=0.05');
+    tl.to(pulseLight, { intensity: 7, duration: 0.25 }, '<');
+    tl.to(pinMaterials, { emissiveIntensity: 1, duration: 0.4, stagger: 0.045, ease: 'power1.out' }, '<0.05');
+    tl.to(pulseLight, { intensity: 2, duration: 0.5 });
+
+    // 3. chip expands, camera pushes in
+    tl.to(icGroup.scale, { x: 9, y: 9, z: 9, duration: 1.1, ease: 'power2.in' }, '+=0.15');
+    tl.to(camera.position, {
+      x: icGroup.position.x,
+      y: icGroup.position.y + 0.4,
+      z: icGroup.position.z + 2.8,
+      duration: 1.1, ease: 'power2.in'
+    }, '<');
+
+    // 4. cross-fade into homepage
+    tl.to(introEl, { opacity: 0, duration: 0.7, ease: 'power1.out' }, '+=0.1');
+
+    // ---- skip button ----
+    skipBtn.addEventListener('click', () => {
+      tl.kill();
+      gsap.to(introEl, { opacity: 0, duration: 0.4, onComplete: finish });
+    });
+
+  } catch (err) {
+    // Any unexpected WebGL/runtime error → fail safe to homepage
+    if (rafId) cancelAnimationFrame(rafId);
+    document.body.classList.remove('intro-active');
+    introEl.style.display = 'none';
+    homepageEl.classList.add('visible');
+  }
+})();
+</script>
+</body>
+</html>
