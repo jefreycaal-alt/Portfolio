@@ -38,8 +38,9 @@ h1,h2,h3,.display{font-family:'Space Mono',monospace;font-weight:700;letter-spac
 ===================================================================== */
 #intro{display:none;position:fixed;inset:0;z-index:1000;background:var(--pcb-bg);align-items:center;justify-content:center;}
 #pcb-canvas{width:100%;height:100%;display:block;outline:none;}
-#skip-intro{position:absolute;bottom:28px;right:28px;z-index:1001;font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.2em;padding:12px 22px;background:transparent;border:1px solid var(--pcb-pulse);color:var(--pcb-pulse);cursor:pointer;transition:background .15s,color .15s;}
-#skip-intro:hover,#skip-intro:focus-visible{background:var(--pcb-pulse);color:var(--pcb-bg);outline:2px solid var(--pcb-glow);outline-offset:2px;}
+#intro-glitch{position:absolute;inset:0;z-index:1001;pointer-events:none;opacity:0;overflow:hidden;}
+#skip-intro{position:absolute;bottom:28px;right:28px;z-index:1002;font-family:'Space Mono',monospace;font-size:.72rem;letter-spacing:.2em;padding:12px 22px;background:transparent;border:1px solid var(--orange);color:var(--orange);cursor:pointer;transition:background .15s,color .15s;}
+#skip-intro:hover,#skip-intro:focus-visible{background:var(--orange);color:var(--pcb-bg);outline:2px solid var(--red);outline-offset:2px;}
 body.intro-active{overflow:hidden;}
 
 /* =====================================================================
@@ -91,7 +92,6 @@ body.intro-active .homepage{opacity:0;}
 .projects{padding:72px 0;}
 .project-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:32px;}
 
-/* Cards are now clickable */
 .card{
   position:relative;border:1px solid var(--line);background:var(--paper);
   transition:transform .18s ease,box-shadow .18s ease;
@@ -105,13 +105,11 @@ body.intro-active .homepage{opacity:0;}
 .card-top{height:4px;background:var(--orange);}
 .card.is-placeholder .card-top{background:var(--line);}
 
-/* click-to-open hint on image area */
 .img-box{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;border-bottom:1px solid var(--line);}
 .img-placeholder{width:100%;aspect-ratio:16/10;background:var(--paper-alt);border-bottom:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink-soft);}
 .img-placeholder svg{width:36px;height:36px;}
 .img-placeholder span{font-size:.68rem;letter-spacing:.2em;font-family:'Space Mono',monospace;}
 
-/* image count badge */
 .img-count-badge{
   position:absolute;top:12px;right:12px;
   background:rgba(28,28,26,.75);
@@ -148,7 +146,6 @@ body.intro-active .homepage{opacity:0;}
 }
 #lightbox.open{display:flex;}
 
-/* top bar */
 .lb-topbar{
   position:absolute;top:0;left:0;right:0;
   display:flex;align-items:center;justify-content:space-between;
@@ -175,7 +172,6 @@ body.intro-active .homepage{opacity:0;}
 }
 .lb-close:hover,.lb-close:focus-visible{background:var(--pcb-pulse);color:var(--pcb-bg);outline:none;}
 
-/* image area */
 .lb-stage{
   display:flex;align-items:center;justify-content:center;
   width:100%;max-width:1000px;
@@ -199,7 +195,6 @@ body.intro-active .homepage{opacity:0;}
 }
 .lb-img-wrap img.fading{opacity:0;}
 
-/* placeholder for cards with no real images */
 .lb-placeholder{
   width:100%;
   max-width:600px;
@@ -212,7 +207,6 @@ body.intro-active .homepage{opacity:0;}
 .lb-placeholder svg{width:48px;height:48px;}
 .lb-placeholder span{font-family:'Space Mono',monospace;font-size:.68rem;letter-spacing:.25em;}
 
-/* prev / next buttons */
 .lb-prev,.lb-next{
   position:absolute;top:50%;transform:translateY(-50%);
   background:transparent;
@@ -236,7 +230,6 @@ body.intro-active .homepage{opacity:0;}
   opacity:.2;cursor:default;pointer-events:none;
 }
 
-/* dot indicators */
 .lb-dots{
   display:flex;gap:8px;margin-top:20px;justify-content:center;flex-shrink:0;
 }
@@ -248,7 +241,6 @@ body.intro-active .homepage{opacity:0;}
 }
 .lb-dot.active{background:var(--pcb-pulse);}
 
-/* swipe hint (mobile) */
 .lb-swipe-hint{
   font-family:'Space Mono',monospace;font-size:.6rem;letter-spacing:.2em;
   color:rgba(155,255,236,.3);margin-top:12px;
@@ -351,6 +343,7 @@ body.intro-active .homepage{opacity:0;}
 <!-- INTRO -->
 <div id="intro">
   <canvas id="pcb-canvas" aria-hidden="true"></canvas>
+  <div id="intro-glitch" aria-hidden="true"></div>
   <button id="skip-intro" type="button" aria-label="Skip intro animation">SKIP INTRO »</button>
 </div>
 
@@ -375,7 +368,7 @@ body.intro-active .homepage{opacity:0;}
 <!-- HOMEPAGE -->
 <div id="homepage" class="homepage">
 
-<header class="hero">
+<header class="hero" data-screen-label="HERO">
   <div class="wrap hero-grid">
     <div>
       <div class="eyebrow">
@@ -434,7 +427,7 @@ body.intro-active .homepage{opacity:0;}
   </div>
 </header>
 
-<section class="experience">
+<section class="experience" data-screen-label="EXPERIENCE">
   <div class="wrap">
     <div class="marker"><span class="marker-num">01</span><span class="marker-rule"></span><span class="marker-label">HISTORY</span></div>
     <h2 class="section-title">EXPERIENCE</h2>
@@ -448,20 +441,21 @@ body.intro-active .homepage{opacity:0;}
         </div>
         <div class="t-org">SOUTH COAST AQMD</div>
         <p class="t-desc"> -Reviewed documentation regarding permit, title V and Reclaim facilities, as well as OnBase and PAATS.</p>
-        <p class="t-desc"> -Identified 100 + potential pollutants being stored in facilities by reviewing through documentation using OnBase unity client, and info such as application number, permit number, facility ID, and each company’s location info, then documented data onto an BCAT spreadsheet. </p>
+        <p class="t-desc"> -Identified 100 + potential pollutants being stored in facilities by reviewing through documentation using OnBase unity client, and info such as application number, permit number, facility ID, and each company's location info, then documented data onto an BCAT spreadsheet. </p>
       </div>
+    </div>
 
    <div class="timeline">
       <div class="t-item">
         <div class="t-marker"></div>
         <div class="t-head">
-          <h3>THERMAL & MECHANICAL, HARDWARE, and ELECTRICAL TEAM MEMBER</h3>
+          <h3>THERMAL &amp; MECHANICAL, HARDWARE, and ELECTRICAL TEAM MEMBER</h3>
           <span class="t-date">JAN 2026 - JUNE 2026 </span>
         </div>
         <div class="t-org">BATTERY WORKFORCE CHALLENGE</div>
         <p class="t-desc"> -Designed a multi-angle bending jig in Solidworks, with the goal of bending 18 busbars for the battery disconnecting unit, allowing for better work flow and more accuracy in bent angle, which  prevents cracks and gaps that could reduce conductivity.</p>
 	<p class="t-desc"> -Used Siemens NX to CAD wire harnesses that connects the battery module busbars V-sense to the fusebox, and CSC to fusebox as well.</p>
-	<p class="t-desc"> -Designed high voltage wiring on Siemens NX, connecting the BDU’s DCFC, EDM, and PDC to main battery module connectors and chassis ground, using compression lugs and M8 fasteners, and low voltage wiring connecting the BDU to the OpenECU M130 and M450.</p>
+	<p class="t-desc"> -Designed high voltage wiring on Siemens NX, connecting the BDU's DCFC, EDM, and PDC to main battery module connectors and chassis ground, using compression lugs and M8 fasteners, and low voltage wiring connecting the BDU to the OpenECU M130 and M450.</p>
 	<p class="t-desc"> -Used Siemens NX to design foam strips, supporting battery modules within enclosure, ensuring CAD meets competition requirements before deadline.</p>
 	<p class="t-desc"> -Assembled the battery module wire harness that connected the CSC to the fusebox and V-sense to fusebox, soldering 30+ wires and insulating each wire following the buildbook.</p>
 	<p class="t-desc"> -Contributed to BDU final design, by adding a necessary T-shaped busbar in the CAD, to ensure two wires could be connected.</p>
@@ -480,7 +474,7 @@ body.intro-active .homepage{opacity:0;}
   </div>
 </nav>
 
-<section class="projects" id="projects">
+<section class="projects" id="projects" data-screen-label="PROJECTS">
   <div class="wrap">
     <div class="marker"><span class="marker-num">02</span><span class="marker-rule"></span><span class="marker-label">SELECTED WORK</span></div>
     <h2 class="section-title">PROJECTS</h2>
@@ -500,19 +494,13 @@ body.intro-active .homepage{opacity:0;}
       -->
 
       <!-- CARD 01 — Battery Module -->
-      <!--
-        EXAMPLE with real images (uncomment and fill in YOUR filenames):
-        <article class="card" data-tags="ece hardware"
-          data-title="BATTERY MODULE & BDU ASSEMBLY"
-          data-gallery='["images/battery-1.jpg","images/battery-2.jpg","images/battery-3.jpg"]'>
-      -->
       <article class="card" data-tags="ece hardware"
         data-title="BATTERY MODULE &amp; BDU ASSEMBLY"
         data-gallery='["images/batt0.PNG","images/batt1.PNG","images/batt2.PNG","images/batt3.webp"]'>
         <div class="card-top"></div>
         <span class="img-count-badge" aria-hidden="true"></span>
         <img src="images/batt1.PNG" alt="description" class="img-box">
-         
+
         <div class="card-body">
           <div class="card-tags"><span class="tag tag-fill">ECE</span><span class="tag tag-line">HARDWARE</span></div>
           <span class="card-num">01</span>
@@ -529,7 +517,7 @@ body.intro-active .homepage{opacity:0;}
         <div class="card-top"></div>
         <span class="img-count-badge" aria-hidden="true"></span>
         <img src="images/nucr.PNG" alt="description" class="img-box">
-		  
+
         <div class="card-body">
           <div class="card-tags"><span class="tag tag-fill">SOFTWARE</span><span class="tag tag-line">PYTHON</span></div>
           <span class="card-num">02</span>
@@ -543,7 +531,7 @@ body.intro-active .homepage{opacity:0;}
   </div>
 	</section>
 
-<section class="skills">
+<section class="skills" data-screen-label="SKILLS">
   <div class="wrap">
     <div class="marker"><span class="marker-num">03</span><span class="marker-rule"></span><span class="marker-label">CAPABILITIES</span></div>
     <h2 class="section-title">SKILLS <span class="accent">&amp;</span> TOOLS</h2>
@@ -557,13 +545,13 @@ body.intro-active .homepage{opacity:0;}
   </div>
 </section>
 
-<section class="about">
+<section class="about" data-screen-label="ABOUT">
   <div class="wrap">
     <div class="marker"><span class="marker-num">04</span><span class="marker-rule"></span><span class="marker-label">WHO I AM</span></div>
     <h2 class="section-title">ABOUT ME</h2>
 
     <div class="about-grid">
-      <img src="images/portrait.jpg" alt="JefreyCaal" class="about-photo"> 
+      <img src="images/portrait.jpg" alt="JefreyCaal" class="about-photo">
       <div class="about-text">
         <p>[ Name is Jefrey, I'm a software-hardware tinkerer with experience on high voltage systems I want to implement what I learn to fix problems and build cool stuff. I aim to help the world be a better place. I'm currently majoring in ECE]</p>
         <p>[ I've always had a passion for robotics and space. By working on a wide variety of projects I have grown my skillset into what I like to call a swiss knife. I have a strong focus on CAD, electronics, and AI. ]</p>
@@ -578,7 +566,7 @@ body.intro-active .homepage{opacity:0;}
   </div>
 </section>
 
-<section class="education">
+<section class="education" data-screen-label="EDUCATION">
   <div class="wrap">
     <div class="marker"><span class="marker-num">05</span><span class="marker-rule"></span><span class="marker-label">BACKGROUND</span></div>
     <h2 class="section-title">EDUCATION</h2>
@@ -603,7 +591,7 @@ body.intro-active .homepage{opacity:0;}
   </div>
 </section>
 
-<section class="contact" id="contact">
+<section class="contact" id="contact" data-screen-label="CONTACT">
   <div class="wrap">
     <div class="marker"><span class="marker-num">06</span><span class="marker-rule"></span><span class="marker-label">CONNECT</span></div>
     <h2>LET'S BUILD SOMETHING</h2>
@@ -662,7 +650,6 @@ body.intro-active .homepage{opacity:0;}
   let images = [], current = 0;
   let touchStartX = 0, touchEndX = 0;
 
-  /* ---- open ---- */
   function openLightbox(card){
     const raw = card.dataset.gallery || '[]';
     try { images = JSON.parse(raw); } catch(e){ images = []; }
@@ -677,7 +664,6 @@ body.intro-active .homepage{opacity:0;}
     lbClose.focus();
   }
 
-  /* ---- close ---- */
   function closeLightbox(){
     lb.classList.remove('open');
     document.body.style.overflow = '';
@@ -685,7 +671,6 @@ body.intro-active .homepage{opacity:0;}
     images = []; current = 0;
   }
 
-  /* ---- go to index ---- */
   function goTo(idx, animate){
     if(images.length === 0){
       lbWrap.innerHTML = `
@@ -731,7 +716,6 @@ body.intro-active .homepage{opacity:0;}
     updateDots(current);
   }
 
-  /* ---- dots ---- */
   function buildDots(){
     lbDots.innerHTML = '';
     if(images.length <= 1) return;
@@ -747,9 +731,7 @@ body.intro-active .homepage{opacity:0;}
     lbDots.querySelectorAll('.lb-dot').forEach((d,i) => d.classList.toggle('active', i===idx));
   }
 
-  /* ---- card click badges ---- */
   document.querySelectorAll('.card').forEach(card => {
-    // set badge count
     const badge = card.querySelector('.img-count-badge');
     if(badge){
       let imgs = [];
@@ -758,7 +740,6 @@ body.intro-active .homepage{opacity:0;}
       else if(imgs.length === 1) badge.textContent = `1 PHOTO`;
     }
 
-    // open on click
     card.addEventListener('click', () => openLightbox(card));
     card.setAttribute('tabindex','0');
     card.setAttribute('role','button');
@@ -768,15 +749,12 @@ body.intro-active .homepage{opacity:0;}
     });
   });
 
-  /* ---- nav buttons ---- */
   lbPrev.addEventListener('click', () => goTo(current-1, true));
   lbNext.addEventListener('click', () => goTo(current+1, true));
   lbClose.addEventListener('click', closeLightbox);
 
-  /* ---- backdrop click ---- */
   lb.addEventListener('click', e => { if(e.target === lb) closeLightbox(); });
 
-  /* ---- keyboard ---- */
   document.addEventListener('keydown', e => {
     if(!lb.classList.contains('open')) return;
     if(e.key === 'Escape')      closeLightbox();
@@ -784,7 +762,6 @@ body.intro-active .homepage{opacity:0;}
     if(e.key === 'ArrowRight')  goTo(current+1, true);
   });
 
-  /* ---- touch / swipe ---- */
   lb.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, {passive:true});
   lb.addEventListener('touchend',   e => {
     touchEndX = e.changedTouches[0].screenX;
@@ -797,12 +774,13 @@ body.intro-active .homepage{opacity:0;}
 })();
 
 /* =====================================================================
-   PCB INTRO
+   INTRO — first-person wire POV -> PCB flyover -> chip light-up -> glitch
 ===================================================================== */
 (function(){
-  const introEl   = document.getElementById('intro');
-  const homepageEl= document.getElementById('homepage');
-  const skipBtn   = document.getElementById('skip-intro');
+  const introEl    = document.getElementById('intro');
+  const homepageEl = document.getElementById('homepage');
+  const skipBtn    = document.getElementById('skip-intro');
+  const glitchEl   = document.getElementById('intro-glitch');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduceMotion) return;
   if(typeof THREE==='undefined'||typeof gsap==='undefined') return;
@@ -825,6 +803,8 @@ body.intro-active .homepage{opacity:0;}
     homepageEl.classList.add('visible');
     document.body.classList.remove('intro-active');
     introEl.style.display='none';
+    glitchEl.innerHTML='';
+    glitchEl.style.opacity=0;
     if(rafId) cancelAnimationFrame(rafId);
     if(resizeHandler) window.removeEventListener('resize',resizeHandler);
     if(renderer) renderer.dispose();
@@ -834,94 +814,191 @@ body.intro-active .homepage{opacity:0;}
 
   try{
     const canvas=document.getElementById('pcb-canvas');
-    renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'low-power'});
+    renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false,powerPreference:'low-power',preserveDrawingBuffer:true});
     renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
     renderer.setSize(window.innerWidth,window.innerHeight);
 
     const scene=new THREE.Scene();
     scene.background=new THREE.Color(0x05080c);
-    scene.fog=new THREE.FogExp2(0x05080c,0.045);
+    scene.fog=new THREE.FogExp2(0x05080c,0.012);
 
-    const camera=new THREE.PerspectiveCamera(45,window.innerWidth/window.innerHeight,0.1,100);
-    scene.add(new THREE.AmbientLight(0x0d2a28,1.2));
-    const pulseLight=new THREE.PointLight(0x6dffe3,3,12,2);
+    const camera=new THREE.PerspectiveCamera(34,window.innerWidth/window.innerHeight,0.1,120);
+    const lookTarget=new THREE.Vector3(-13,0.5,2.08);
+
+    scene.add(new THREE.HemisphereLight(0x8fa6c8,0x0a0d12,0.85));
+    const keyLight=new THREE.DirectionalLight(0xdfe6ee,0.5);
+    keyLight.position.set(6,14,8);scene.add(keyLight);
+    const pulseLight=new THREE.PointLight(0xffb020,0,10,2);
     scene.add(pulseLight);
+    const chipLight=new THREE.PointLight(0xff5a1f,0,7,2);
+    chipLight.position.set(0,1.5,0);scene.add(chipLight);
 
-    const curvePts=[
-      new THREE.Vector3(-10,0.6,1.5),
-      new THREE.Vector3(-6,1.4,-1),
-      new THREE.Vector3(-2,-0.6,-3.5),
-      new THREE.Vector3(2.2,0.8,-6),
-      new THREE.Vector3(6.2,0.1,-9)
-    ];
-    const curve=new THREE.CatmullRomCurve3(curvePts);
-
+    /* ---- wire tunnel (first-person entry) ---- */
+    const tunnelCurve=new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-15.4,0.55,2.55),
+      new THREE.Vector3(-14.4,0.7,1.9),
+      new THREE.Vector3(-13.6,0.5,2.25),
+      new THREE.Vector3(-13,0.45,2.08)
+    ]);
     scene.add(new THREE.Mesh(
-      new THREE.TubeGeometry(curve,120,0.045,8,false),
-      new THREE.MeshBasicMaterial({color:0x163b33})
+      new THREE.TubeGeometry(tunnelCurve,40,0.14,10,false),
+      new THREE.MeshStandardMaterial({color:0x39424f,roughness:0.6,metalness:0.4})
     ));
 
-    const board=new THREE.Mesh(new THREE.PlaneGeometry(60,40),new THREE.MeshBasicMaterial({color:0x070d12,side:THREE.DoubleSide}));
-    board.position.set(0,-4,-5);board.rotation.x=Math.PI/2.3;scene.add(board);
-    const grid=new THREE.GridHelper(60,30,0x102420,0x0a1815);
-    grid.position.set(0,-3.98,-5);scene.add(grid);
+    /* ---- PCB board ---- */
+    const BOARD=26;
+    const traceDefs=[
+      [[0.03,0.12],[0.32,0.12],[0.32,0.45],[0.45,0.45]],
+      [[0.03,0.28],[0.22,0.28],[0.22,0.48],[0.45,0.48]],
+      [[0.03,0.5],[0.3,0.5],[0.45,0.5]],
+      [[0.03,0.72],[0.2,0.72],[0.2,0.52],[0.45,0.52]],
+      [[0.03,0.88],[0.16,0.88],[0.16,0.55],[0.45,0.55]],
+      [[0.97,0.12],[0.68,0.12],[0.68,0.45],[0.55,0.45]],
+      [[0.97,0.28],[0.78,0.28],[0.78,0.48],[0.55,0.48]],
+      [[0.97,0.5],[0.7,0.5],[0.55,0.5]],
+      [[0.97,0.72],[0.8,0.72],[0.8,0.52],[0.55,0.52]],
+      [[0.97,0.88],[0.84,0.88],[0.84,0.55],[0.55,0.55]],
+      [[0.18,0.03],[0.18,0.24],[0.4,0.24],[0.4,0.45],[0.47,0.45]],
+      [[0.4,0.03],[0.4,0.18],[0.47,0.18],[0.47,0.45]],
+      [[0.62,0.03],[0.62,0.2],[0.53,0.2],[0.53,0.45]],
+      [[0.82,0.03],[0.82,0.26],[0.6,0.26],[0.6,0.45],[0.55,0.45]],
+      [[0.2,0.97],[0.2,0.74],[0.44,0.74],[0.44,0.55]],
+      [[0.5,0.97],[0.5,0.76],[0.5,0.55]],
+      [[0.78,0.97],[0.78,0.72],[0.56,0.72],[0.56,0.55]]
+    ];
 
-    const viaMat=new THREE.MeshBasicMaterial({color:0x2a5a4f});
-    [0.15,0.4,0.65,0.85].forEach(t=>{
-      const p=curve.getPointAt(t);
-      const v=new THREE.Mesh(new THREE.CylinderGeometry(0.07,0.07,0.05,12),viaMat);
-      v.position.copy(p);v.position.y-=0.05;scene.add(v);
+    function buildBoardTexture(){
+      const size=1024;
+      const c=document.createElement('canvas');c.width=c.height=size;
+      const ctx=c.getContext('2d');
+      const g=ctx.createLinearGradient(0,0,size,size);
+      g.addColorStop(0,'#3c4652');g.addColorStop(1,'#262d35');
+      ctx.fillStyle=g;ctx.fillRect(0,0,size,size);
+      ctx.strokeStyle='rgba(255,255,255,.035)';ctx.lineWidth=1;
+      for(let i=0;i<=16;i++){
+        const p=i/16*size;
+        ctx.beginPath();ctx.moveTo(p,0);ctx.lineTo(p,size);ctx.stroke();
+        ctx.beginPath();ctx.moveTo(0,p);ctx.lineTo(size,p);ctx.stroke();
+      }
+      traceDefs.forEach(pts=>{
+        ctx.strokeStyle='#8b97a4';ctx.lineWidth=7;ctx.lineJoin='round';ctx.lineCap='round';
+        ctx.beginPath();
+        pts.forEach((p,i)=>{const x=p[0]*size,y=p[1]*size;i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+        ctx.stroke();
+        ctx.fillStyle='#a3aeb9';
+        pts.forEach((p,i)=>{
+          if(i>0&&i<pts.length-1){ctx.beginPath();ctx.arc(p[0]*size,p[1]*size,6,0,Math.PI*2);ctx.fill();}
+        });
+        const s=pts[0];
+        ctx.beginPath();ctx.arc(s[0]*size,s[1]*size,9,0,Math.PI*2);ctx.fillStyle='#b7c1cb';ctx.fill();
+      });
+      ctx.fillStyle='#20262c';ctx.fillRect(size*0.44,size*0.44,size*0.12,size*0.12);
+      ctx.strokeStyle='#4a545f';ctx.lineWidth=2;ctx.strokeRect(size*0.44,size*0.44,size*0.12,size*0.12);
+      return new THREE.CanvasTexture(c);
+    }
+    const boardTex=buildBoardTexture();
+    const board=new THREE.Mesh(
+      new THREE.PlaneGeometry(BOARD,BOARD),
+      new THREE.MeshStandardMaterial({map:boardTex,roughness:0.85,metalness:0.1})
+    );
+    board.rotation.x=-Math.PI/2;scene.add(board);
+
+    /* ---- chip ---- */
+    const chipMat=new THREE.MeshStandardMaterial({
+      color:0x2a2f36,roughness:0.55,metalness:0.35,
+      emissive:new THREE.Color(0x000000),emissiveIntensity:0
     });
+    const chip=new THREE.Mesh(new THREE.BoxGeometry(2.4,0.5,2.4),chipMat);
+    chip.position.set(0,0.25,0);scene.add(chip);
 
-    function addBranch(t,dir,comp){
-      const s=curve.getPointAt(t),e=s.clone().add(dir);
-      scene.add(new THREE.Mesh(
-        new THREE.TubeGeometry(new THREE.CatmullRomCurve3([s,e]),8,0.03,6,false),
-        new THREE.MeshBasicMaterial({color:0x123a30})
-      ));
-      if(comp==='resistor'){
-        const b=new THREE.Mesh(new THREE.BoxGeometry(0.5,0.16,0.16),new THREE.MeshStandardMaterial({color:0x3a2a1a,roughness:0.6}));
-        b.position.copy(e);scene.add(b);
-        const band=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.18,0.18),new THREE.MeshStandardMaterial({color:0xd7263d,roughness:0.5}));
-        band.position.copy(e).add(new THREE.Vector3(0.15,0,0));scene.add(band);
-      } else if(comp==='capacitor'){
-        const c=new THREE.Mesh(new THREE.CylinderGeometry(0.14,0.14,0.3,16),new THREE.MeshStandardMaterial({color:0x1c2a2e,roughness:0.4}));
-        c.position.copy(e);c.rotation.z=Math.PI/2;scene.add(c);
+    const pinMat=new THREE.MeshStandardMaterial({color:0x6b7280,roughness:0.4,metalness:0.6});
+    for(let side=0;side<4;side++){
+      for(let i=0;i<7;i++){
+        const off=(i-3)*0.32;
+        const pin=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.1,0.3),pinMat);
+        if(side===0)pin.position.set(off,0.05,-1.32);
+        if(side===1)pin.position.set(off,0.05,1.32);
+        if(side===2){pin.position.set(-1.32,0.05,off);pin.rotation.y=Math.PI/2;}
+        if(side===3){pin.position.set(1.32,0.05,off);pin.rotation.y=Math.PI/2;}
+        scene.add(pin);
       }
     }
-    addBranch(0.28,new THREE.Vector3(-0.8,0.9,0.4),'resistor');
-    addBranch(0.6,new THREE.Vector3(0.6,-1.0,0.6),'capacitor');
 
-    const pulse=new THREE.Mesh(new THREE.SphereGeometry(0.1,16,16),new THREE.MeshBasicMaterial({color:0x9bffec}));
-    scene.add(pulse);
-
-    const icGroup=new THREE.Group();
-    const icMat=new THREE.MeshStandardMaterial({color:0x12161c,emissive:0x39ffc8,emissiveIntensity:0,roughness:0.35,metalness:0.4});
-    icGroup.add(new THREE.Mesh(new THREE.BoxGeometry(1.6,0.3,1.6),icMat));
-    const pinMats=[];
-    for(let i=0;i<4;i++){
-      [-0.85,0.85].forEach(side=>{
-        const m=new THREE.MeshStandardMaterial({color:0x2a2e35,emissive:0x39ffc8,emissiveIntensity:0});
-        const pin=new THREE.Mesh(new THREE.BoxGeometry(0.12,0.08,0.3),m);
-        pin.position.set(side,-0.05,-0.555+i*0.37);
-        icGroup.add(pin);pinMats.push(m);
-      });
+    function buildLabelTexture(){
+      const c=document.createElement('canvas');c.width=512;c.height=256;
+      const ctx=c.getContext('2d');
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle='#ffffff';
+      ctx.font='700 120px "Space Mono", monospace';
+      ctx.fillText('CAAL',256,150);
+      ctx.font='400 30px "Courier Prime", monospace';
+      ctx.fillStyle='rgba(255,255,255,.72)';
+      ctx.fillText('J E F R E Y',256,66);
+      return new THREE.CanvasTexture(c);
     }
-    icGroup.position.copy(curvePts[curvePts.length-1]);
-    scene.add(icGroup);
+    const labelMat=new THREE.MeshBasicMaterial({
+      map:buildLabelTexture(),transparent:true,depthWrite:false,color:new THREE.Color(0x4b5158)
+    });
+    const label=new THREE.Mesh(new THREE.PlaneGeometry(2.0,1.0),labelMat);
+    label.rotation.x=-Math.PI/2;label.position.set(0,0.51,0);scene.add(label);
 
-    function updateCamera(t){
-      const ct=Math.min(t,0.999);
-      const pos=curve.getPointAt(ct);
-      const ahead=curve.getPointAt(Math.min(ct+0.015,1));
-      pulse.position.copy(pos);pulseLight.position.copy(pos);
-      const wobble=Math.sin(t*30)*0.015;
-      camera.position.set(pos.x,pos.y+0.55+wobble,pos.z+2.1);
-      camera.lookAt(ahead.x,ahead.y+0.1,ahead.z);
+    /* ---- glowing pulses ---- */
+    function makeGlowTexture(){
+      const c=document.createElement('canvas');c.width=c.height=128;
+      const ctx=c.getContext('2d');
+      const g=ctx.createRadialGradient(64,64,0,64,64,64);
+      g.addColorStop(0,'rgba(255,244,214,1)');
+      g.addColorStop(0.35,'rgba(255,176,32,.95)');
+      g.addColorStop(0.7,'rgba(255,106,26,.35)');
+      g.addColorStop(1,'rgba(255,106,26,0)');
+      ctx.fillStyle=g;ctx.fillRect(0,0,128,128);
+      return new THREE.CanvasTexture(c);
     }
-    updateCamera(0);
+    const glowTex=makeGlowTexture();
+    function makeSprite(scale,opacity){
+      const m=new THREE.SpriteMaterial({map:glowTex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,opacity});
+      const s=new THREE.Sprite(m);s.scale.set(scale,scale,1);scene.add(s);return s;
+    }
+    function uvToWorld(p,y){return new THREE.Vector3((p[0]-0.5)*BOARD,y,(p[1]-0.5)*BOARD);}
+    function buildPath(pts,y){return pts.map(p=>uvToWorld(p,y));}
+    function segLengths(pts){let acc=[0];for(let i=1;i<pts.length;i++)acc.push(acc[i-1]+pts[i].distanceTo(pts[i-1]));return acc;}
+    function posAtT(pts,acc,t){
+      const total=acc[acc.length-1];const d=Math.max(0,Math.min(1,t))*total;
+      for(let i=1;i<acc.length;i++){
+        if(d<=acc[i]||i===acc.length-1){
+          const segLen=acc[i]-acc[i-1]||1;const lt=(d-acc[i-1])/segLen;
+          return pts[i-1].clone().lerp(pts[i],Math.max(0,Math.min(1,lt)));
+        }
+      }
+      return pts[pts.length-1].clone();
+    }
 
-    function renderLoop(){rafId=requestAnimationFrame(renderLoop);renderer.render(scene,camera);}
+    const pulses=traceDefs.map((def)=>{
+      const pts=buildPath(def,0.1);
+      const acc=segLengths(pts);
+      const head=makeSprite(0.85,0.95);
+      const echoes=[makeSprite(0.6,0.5),makeSprite(0.42,0.28),makeSprite(0.28,0.14)];
+      return {pts,acc,head,echoes,state:{t:0}};
+    });
+    function updatePulse(p){
+      const {pts,acc,head,echoes,state}=p;
+      head.position.copy(posAtT(pts,acc,state.t));
+      echoes.forEach((e,i)=>{e.position.copy(posAtT(pts,acc,state.t-(i+1)*0.035));});
+    }
+
+    const tunnelPts=tunnelCurve.getPoints(30);
+    const tunnelAcc=segLengths(tunnelPts);
+    const tunnelHead=makeSprite(0.5,1);
+    const tunnelState={t:0};
+    function updateTunnelPulse(){tunnelHead.position.copy(posAtT(tunnelPts,tunnelAcc,tunnelState.t));}
+
+    camera.position.set(-15.4,0.55,2.55);
+
+    function renderLoop(){
+      rafId=requestAnimationFrame(renderLoop);
+      camera.lookAt(lookTarget);
+      renderer.render(scene,camera);
+    }
     renderLoop();
 
     resizeHandler=function(){
@@ -931,23 +1008,84 @@ body.intro-active .homepage{opacity:0;}
     };
     window.addEventListener('resize',resizeHandler);
 
-    const progress={t:0};
-    const tl=gsap.timeline({onComplete:finish});
-    tl.to(progress,{t:1,duration:4.2,ease:'power1.inOut',onUpdate:()=>updateCamera(progress.t)});
-    tl.to(icMat,{emissiveIntensity:1.4,duration:0.5,ease:'power2.out'},'+=0.05');
-    tl.to(pulseLight,{intensity:7,duration:0.25},'<');
-    tl.to(pinMats,{emissiveIntensity:1,duration:0.4,stagger:0.045,ease:'power1.out'},'<0.05');
-    tl.to(pulseLight,{intensity:2,duration:0.5});
-    tl.to(icGroup.scale,{x:9,y:9,z:9,duration:1.1,ease:'power2.in'},'+=0.15');
-    tl.to(camera.position,{x:icGroup.position.x,y:icGroup.position.y+0.4,z:icGroup.position.z+2.8,duration:1.1,ease:'power2.in'},'<');
-    tl.to(introEl,{opacity:0,duration:0.7,ease:'power1.out'},'+=0.1');
+    /* ---- glitch reveal ---- */
+    function runGlitch(){
+      cancelAnimationFrame(rafId);
+      const w=renderer.domElement.clientWidth,h=renderer.domElement.clientHeight;
+      let snap=null;
+      try{ snap=renderer.domElement.toDataURL('image/png'); }catch(e){ snap=null; }
+      glitchEl.innerHTML='';
+      if(snap){
+        const still=document.createElement('div');
+        still.style.cssText='position:absolute;inset:0;background:url('+snap+') center/cover;'+
+          'filter:drop-shadow(4px 0 rgba(255,50,60,.85)) drop-shadow(-4px 0 rgba(60,220,255,.7));';
+        glitchEl.appendChild(still);
+
+        for(let i=0;i<8;i++){
+          const top=Math.random()*h;
+          const bh=18+Math.random()*70;
+          const band=document.createElement('div');
+          band.style.cssText='position:absolute;left:0;width:100%;top:'+top+'px;height:'+bh+'px;'+
+            'background:url('+snap+') 0 -'+top+'px/'+w+'px '+h+'px;';
+          glitchEl.appendChild(band);
+          gsap.timeline({repeat:3})
+            .set(band,{x:(Math.random()-0.5)*70},0)
+            .set(band,{x:0},0.06)
+            .set(band,{x:(Math.random()-0.5)*45},0.12)
+            .set(band,{x:0},0.17);
+        }
+      }
+      glitchEl.style.opacity=1;
+      gsap.timeline()
+        .to({},{duration:0.55})
+        .to(glitchEl,{opacity:0,duration:0.35})
+        .call(finish);
+    }
+
+    /* ---- master timeline ---- */
+    const tl=gsap.timeline();
+
+    // Phase 0 (0 - 1.05s): first-person POV riding the pulse through the wire
+    tl.to(tunnelState,{t:1,duration:1.05,ease:'power1.in',onUpdate:updateTunnelPulse},0);
+    tl.to(camera.position,{x:-13.3,y:0.5,z:2.15,duration:1.05,ease:'power1.in'},0);
+    tl.to(lookTarget,{x:-12,y:0.5,z:1.6,duration:1.05,ease:'power1.in'},0);
+    tl.to(pulseLight,{intensity:3,duration:0.3},0);
+    tl.to(pulseLight.position,{x:-13,y:0.5,z:2.08,duration:0.1},0);
+
+    // Phase 1 (1.05 - 1.95s): pull back and up into a bird's-eye establishing shot
+    tl.to(camera,{fov:48,duration:0.9,ease:'power2.inOut',onUpdate:()=>camera.updateProjectionMatrix()},1.05);
+    tl.to(camera.position,{x:0,y:16,z:15,duration:0.9,ease:'power2.inOut'},1.05);
+    tl.to(lookTarget,{x:0,y:0,z:0,duration:0.9,ease:'power2.inOut'},1.05);
+
+    // Phase 2 (1.95 - 3.95s): flying POV sweeping across the whole board, pulses racing to the chip
+    tl.to(camera.position,{x:8,y:11,z:-5,duration:2.0,ease:'power1.inOut'},1.95);
+    tl.to(lookTarget,{x:0.5,y:0,z:0.8,duration:2.0,ease:'power1.inOut'},1.95);
+    pulses.forEach((p,i)=>{
+      const start=1.6+i*0.09;
+      const dur=1.15+((i%5)*0.12);
+      tl.to(p.state,{t:1,duration:dur,ease:'power1.in',onUpdate:()=>updatePulse(p)},start);
+    });
+
+    // Phase 3 (3.95 - 4.95s): converge above the chip; it lights up lava orange-red
+    tl.to(camera.position,{x:0,y:4.6,z:4.2,duration:1.0,ease:'power2.inOut'},3.95);
+    tl.to(lookTarget,{x:0,y:0.5,z:0,duration:1.0,ease:'power2.inOut'},3.95);
+    tl.to(chipMat.emissive,{r:0.9,g:0.16,b:0.05,duration:0.55,ease:'power2.out'},4.15);
+    tl.to(chipMat,{emissiveIntensity:1.2,duration:0.55,ease:'power2.out'},4.15);
+    tl.to(labelMat.color,{r:1,g:0.35,b:0.12,duration:0.55},4.15);
+    tl.to(chipLight,{intensity:5,duration:0.5,ease:'power2.out'},4.2);
+    tl.to(pulseLight,{intensity:0,duration:0.4},4.2);
+
+    // Phase 4: glitch cut, reveal homepage
+    tl.call(runGlitch,null,4.95);
 
     skipBtn.addEventListener('click',()=>{
       tl.kill();
-      gsap.to(introEl,{opacity:0,duration:0.4,onComplete:finish});
+      gsap.killTweensOf('*');
+      finish();
     });
 
   }catch(err){
+    console.error(err);
     if(rafId) cancelAnimationFrame(rafId);
     document.body.classList.remove('intro-active');
     introEl.style.display='none';
